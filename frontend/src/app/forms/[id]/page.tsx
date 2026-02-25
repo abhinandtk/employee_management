@@ -2,12 +2,22 @@
 import { useEffect, useState } from "react";
 import FormBuilder from "@/components/FormBuilder";
 import api from "@/lib/axios";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function EditForm() {
   const { id } = useParams();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && user && user.role !== "admin") {
+      alert("Only admins can edit forms.");
+      router.push("/dashboard");
+    }
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     const fetchForm = async () => {

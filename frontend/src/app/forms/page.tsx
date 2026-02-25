@@ -4,6 +4,7 @@ import api from "@/lib/axios";
 import Link from "next/link";
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 type Form = {
   id: number;
@@ -14,6 +15,7 @@ type Form = {
 export default function FormsPage() {
   const [forms, setForms] = useState<Form[]>([]);
   const { user } = useAuth();
+  const router = useRouter();
 
   const fetchForms = async () => {
     try {
@@ -86,9 +88,18 @@ export default function FormsPage() {
                   {new Date(form.created_at).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-4">
-                  <Link href={`/forms/${form.id}`} className="text-blue-600 hover:text-blue-900">
+                  <button
+                    onClick={() => {
+                      if (user?.role === "admin") {
+                        router.push(`/forms/${form.id}`);
+                      } else {
+                        alert("Only admins can edit forms.");
+                      }
+                    }}
+                    className="text-blue-600 hover:text-blue-900"
+                  >
                     <Edit className="w-5 h-5 inline" />
-                  </Link>
+                  </button>
                   {user?.role === "admin" && (
                     <button onClick={() => deleteForm(form.id)} className="text-red-600 hover:text-red-900">
                       <Trash2 className="w-5 h-5 inline" />
