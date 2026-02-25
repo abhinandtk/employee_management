@@ -1,7 +1,8 @@
 {
 	"info": {
-		"_postman_id": "4b5d21a2-63b7-4c13-a4e9-38b4c09d22c9",
-		"name": "Employee Management System",
+		"_postman_id": "7f6e5d4c-3b2a-1c0d-e9f8-a7b6c5d4e3f2",
+		"name": "Employee Management System API",
+		"description": "API collection for the Employee Management System built with Django and Next.js.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -15,14 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{
-    "username": "testuser",
-    "email": "test@test.com",
-    "password": "testpassword123!",
-    "role": "admin",
-    "first_name": "Test",
-    "last_name": "User"
-}",
+							"raw": "{\n    \"username\": \"admin_user\",\n    \"email\": \"admin@example.com\",\n    \"password\": \"AdminPass123!\",\n    \"role\": \"admin\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"User\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -30,12 +24,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/auth/register/",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/auth/register/",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"auth",
@@ -47,15 +39,27 @@
 				},
 				{
 					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access) {",
+									"    pm.environment.set(\"access_token\", jsonData.access);",
+									"    pm.environment.set(\"refresh_token\", jsonData.refresh);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{
-    "username": "testuser",
-    "password": "testpassword123!"
-}",
+							"raw": "{\n    \"username\": \"admin_user\",\n    \"password\": \"AdminPass123!\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -63,12 +67,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/auth/login/",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/auth/login/",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"auth",
@@ -77,8 +79,291 @@
 							]
 						}
 					}
+				},
+				{
+					"name": "Token Refresh",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/refresh/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"profile",
+								""
+							]
+						}
+					}
 				}
 			]
+		},
+		{
+			"name": "Forms",
+			"item": [
+				{
+					"name": "List Forms",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/forms/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forms",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Form",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Onboarding Form\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/forms/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forms",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Field to Form",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"label\": \"Phone Number\",\n    \"field_type\": \"number\",\n    \"order\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/forms/:id/fields/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"forms",
+								":id",
+								"fields",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Employees",
+			"item": [
+				{
+					"name": "List Employees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Employee Entry",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"form\": 1,\n    \"data\": {\n        \"First Name\": \"John\",\n        \"Last Name\": \"Doe\",\n        \"Department\": \"Engineering\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/employees/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Employees",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/employees/search/?First Name=John",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"employees",
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "First Name",
+									"value": "John"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000"
 		}
 	]
 }
